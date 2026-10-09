@@ -620,12 +620,13 @@ async function testSupabaseConnection(){
  status.innerHTML='<span class="badge bg-w">Memeriksa…</span>';
  detail.textContent='Menghubungi endpoint API Supabase…';
  try{
-  // Publishable key dikirim melalui apikey. Jangan jadikan key ini Bearer token;
-  // Authorization semestinya berisi access token pengguna setelah login Supabase Auth.
-  const r=await fetch(SUPABASE_URL+'/rest/v1/',{method:'GET',headers:{apikey:SUPABASE_PUBLISHABLE_KEY},cache:'no-store'});
+  // Endpoint health Auth digunakan untuk memeriksa apakah proyek dapat dijangkau.
+  // Endpoint root REST /rest/v1/ dapat meminta secret key untuk introspeksi API,
+  // sehingga bukan tes yang tepat untuk publishable key di browser.
+  const r=await fetch(SUPABASE_URL+'/auth/v1/health',{method:'GET',cache:'no-store'});
   const body=(await r.text()).slice(0,240).replace(/\s+/g,' ').trim();
   if(r.ok){status.innerHTML='<span class="badge bg-ok">API dapat dijangkau</span>';detail.textContent='Endpoint REST Supabase merespons (HTTP '+r.status+'). Ini hanya menguji konektivitas API, belum memeriksa skema, login, RLS, atau sinkronisasi data.';}
-  else{status.innerHTML='<span class="badge bg-w">Perlu pemeriksaan</span>';detail.textContent='API merespons HTTP '+r.status+'. '+(body?'Pesan server: '+body+' ':'')+'Periksa Project URL, publishable key, dan status proyek di dashboard Supabase.';}
+  else{status.innerHTML='<span class="badge bg-w">Perlu pemeriksaan</span>';detail.textContent='Endpoint health merespons HTTP '+r.status+'. '+(body?'Pesan server: '+body+' ':'')+'Periksa Project URL dan status proyek di dashboard Supabase.';}
  }catch(e){status.innerHTML='<span class="badge bg-b">Gagal terhubung</span>';detail.textContent='Permintaan gagal ('+(e?.message||'kesalahan jaringan')+'). Periksa internet, URL proyek, ekstensi pemblokir, dan apakah halaman dibuka melalui hosting HTTPS. Jika browser menampilkan CORS/network error, periksa Console (F12).';}
 }
 
