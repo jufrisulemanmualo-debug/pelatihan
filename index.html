@@ -623,7 +623,7 @@ async function testSupabaseConnection(){
   // Endpoint health Auth digunakan untuk memeriksa apakah proyek dapat dijangkau.
   // Endpoint root REST /rest/v1/ dapat meminta secret key untuk introspeksi API,
   // sehingga bukan tes yang tepat untuk publishable key di browser.
-  const r=await fetch(SUPABASE_URL+'/auth/v1/health',{method:'GET',cache:'no-store'});
+  const r=await fetch(SUPABASE_URL+'/auth/v1/health',{method:'GET',cache:'no-store',headers:{'apikey':SUPABASE_PUBLISHABLE_KEY}});
   const body=(await r.text()).slice(0,240).replace(/\s+/g,' ').trim();
   if(r.ok){status.innerHTML='<span class="badge bg-ok">API dapat dijangkau</span>';detail.textContent='Endpoint REST Supabase merespons (HTTP '+r.status+'). Ini hanya menguji konektivitas API, belum memeriksa skema, login, RLS, atau sinkronisasi data.';}
   else{status.innerHTML='<span class="badge bg-w">Perlu pemeriksaan</span>';detail.textContent='Endpoint health merespons HTTP '+r.status+'. '+(body?'Pesan server: '+body+' ':'')+'Periksa Project URL dan status proyek di dashboard Supabase.';}
