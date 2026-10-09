@@ -620,10 +620,13 @@ async function testSupabaseConnection(){
  status.innerHTML='<span class="badge bg-w">Memeriksa…</span>';
  detail.textContent='Menghubungi endpoint API Supabase…';
  try{
-  const r=await fetch(SUPABASE_URL+'/rest/v1/',{method:'GET',headers:{apikey:SUPABASE_PUBLISHABLE_KEY,Authorization:'Bearer '+SUPABASE_PUBLISHABLE_KEY},cache:'no-store'});
-  if(r.ok){status.innerHTML='<span class="badge bg-ok">API dapat dijangkau</span>';detail.textContent='Endpoint Supabase merespons. Pemeriksaan ini hanya memastikan konektivitas API; belum memeriksa skema, login, kebijakan RLS, atau sinkronisasi data.';}
-  else{status.innerHTML='<span class="badge bg-w">Perlu pemeriksaan</span>';detail.textContent='API merespons dengan HTTP '+r.status+'. Pastikan URL dan publishable key benar serta proyek Supabase aktif.';}
- }catch(e){status.innerHTML='<span class="badge bg-b">Gagal terhubung</span>';detail.textContent='Tidak dapat menghubungi API. Periksa koneksi internet, URL proyek, dan konfigurasi jaringan/CORS.';}
+  // Publishable key dikirim melalui apikey. Jangan jadikan key ini Bearer token;
+  // Authorization semestinya berisi access token pengguna setelah login Supabase Auth.
+  const r=await fetch(SUPABASE_URL+'/rest/v1/',{method:'GET',headers:{apikey:SUPABASE_PUBLISHABLE_KEY},cache:'no-store'});
+  const body=(await r.text()).slice(0,240).replace(/\s+/g,' ').trim();
+  if(r.ok){status.innerHTML='<span class="badge bg-ok">API dapat dijangkau</span>';detail.textContent='Endpoint REST Supabase merespons (HTTP '+r.status+'). Ini hanya menguji konektivitas API, belum memeriksa skema, login, RLS, atau sinkronisasi data.';}
+  else{status.innerHTML='<span class="badge bg-w">Perlu pemeriksaan</span>';detail.textContent='API merespons HTTP '+r.status+'. '+(body?'Pesan server: '+body+' ':'')+'Periksa Project URL, publishable key, dan status proyek di dashboard Supabase.';}
+ }catch(e){status.innerHTML='<span class="badge bg-b">Gagal terhubung</span>';detail.textContent='Permintaan gagal ('+(e?.message||'kesalahan jaringan')+'). Periksa internet, URL proyek, ekstensi pemblokir, dan apakah halaman dibuka melalui hosting HTTPS. Jika browser menampilkan CORS/network error, periksa Console (F12).';}
 }
 
 /* ============ CADANGAN & PERSIAPAN MIGRASI CLOUD ============ */
